@@ -1,8 +1,9 @@
+import logging
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field, field_validator
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-import logging
+from typing import List
 
 logging.basicConfig(level=logging.INFO)
 

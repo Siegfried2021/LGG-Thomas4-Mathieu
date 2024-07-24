@@ -1,15 +1,13 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-import logging
-
-logging.basicConfig(level=logging.INFO)
+from typing import List
 
 app = FastAPI()
 
 class ComputationInput(BaseModel):
-    salary: int = Field(..., description="The salary amount")
+    salary: 100 = Field(..., description="The salary amount")
     bonus: int = Field(..., description="The bonus amount")
     taxes: int = Field(..., description="The taxes amount")
 
@@ -31,12 +29,11 @@ def multiply_by_two(number: int):
 
 @app.post("/compute")
 def compute(input: ComputationInput):
-    logging.info(f"Computing with input: {input}")
     result = input.salary + input.bonus - input.taxes
     return {"result": result}
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+async def validation_exception_handler(request, exc):
     errors = exc.errors()
     error_messages = []
     for error in errors:
@@ -48,6 +45,3 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"error": " | ".join(error_messages)}
     )
 
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)

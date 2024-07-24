@@ -1,10 +1,6 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
-import logging
-
-logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
@@ -13,7 +9,7 @@ class ComputationInput(BaseModel):
     bonus: int = Field(..., description="The bonus amount")
     taxes: int = Field(..., description="The taxes amount")
 
-    @field_validator('salary', 'bonus', 'taxes', mode='before')
+    @field_validator('salary', 'bonus', 'taxes')
     def check_positive(cls, value, field):
         if not isinstance(value, int):
             raise ValueError(f"Field '{field.name}' should be an integer.")
@@ -31,16 +27,15 @@ def multiply_by_two(number: int):
 
 @app.post("/compute")
 def compute(input: ComputationInput):
-    logging.info(f"Computing with input: {input}")
     result = input.salary + input.bonus - input.taxes
     return {"result": result}
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+@app.exception_handler(ValidationError)
+async def validation_exception_handler(request, exc):
     errors = exc.errors()
     error_messages = []
     for error in errors:
-        loc = '.'.join(map(str, error['loc']))  # Convert location list to string
+        loc = '.'.join(error['loc'])
         msg = error['msg']
         error_messages.append(f"Field '{loc}' error: {msg}")
     return JSONResponse(

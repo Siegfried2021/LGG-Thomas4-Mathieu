@@ -1,8 +1,9 @@
+import logging
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field, field_validator
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-import logging
+from typing import List
 
 logging.basicConfig(level=logging.INFO)
 
@@ -48,6 +49,3 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"error": " | ".join(error_messages)}
     )
 
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)

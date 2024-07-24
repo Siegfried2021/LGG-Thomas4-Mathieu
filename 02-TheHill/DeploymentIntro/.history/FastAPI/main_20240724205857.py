@@ -1,10 +1,8 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-import logging
-
-logging.basicConfig(level=logging.INFO)
+from typing import List
 
 app = FastAPI()
 
@@ -31,12 +29,11 @@ def multiply_by_two(number: int):
 
 @app.post("/compute")
 def compute(input: ComputationInput):
-    logging.info(f"Computing with input: {input}")
     result = input.salary + input.bonus - input.taxes
     return {"result": result}
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+async def validation_exception_handler(request, exc):
     errors = exc.errors()
     error_messages = []
     for error in errors:
